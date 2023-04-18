@@ -1,0 +1,1 @@
+wt --title "The Library" -d .\UI Powershell npm run dev ; split-pane -V -d .\Server Powershell npm run start
