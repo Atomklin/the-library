@@ -1,27 +1,16 @@
-import bodyParser from "body-parser";
 import express from "express";
 
-import { SearchRequest } from "./types";
+import search from "./Routes/search";
 
 const app = express();
 const port = 6969;
 
-app.use(bodyParser.json());
+app.disable("x-powered-by");
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.post("/api/search", (req, res) => {
-  const request = req.params as SearchRequest;
-  if (!request.query || !request.options) 
-    return res.sendStatus(400);
+app.use("/api/search", search);
 
-  // Sample Content 
-  return res.json({
-    timestamp: new Date().toISOString(),
-    results: [],
-  });
-});
-
-app.listen(port, () => {
-  console.log("Listening on port", port);
-});
-
-
+app.listen(port, () => 
+  console.log("Listenting to http://localhost:" + port + "/api")
+);

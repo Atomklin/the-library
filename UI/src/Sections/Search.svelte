@@ -1,21 +1,22 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
+
+  import Label from "../Common/typography/Label.svelte";
   import Switch from "../Common/forms/Switch.svelte";
   import Button from "../Common/forms/Button.svelte";
   import Input from "../Common/forms/Input.svelte";
   import Modal from "../Common/Modal.svelte";
   import imgUrl from "../../static/logo.svg";
   import { search } from "../Data/api";
-  import { onMount } from "svelte";
   
   import type { SearchResponse } from "../Data/types";
   export let results: Promise<SearchResponse> | SearchResponse;
 
+  let args = localStorage.getItem("search-args");
   let showOptions = false;
   let safeSearch = true;
   let query: string;
-  let args: string;
 
-  onMount(() => args = localStorage.getItem("search-args"))
   const commonSvgProps = {
     xmlns: "http://www.w3.org/2000/svg",
     stroke: "currentColor",
@@ -25,12 +26,10 @@
   }
 
   function submitQuery() {
-    if (query.length < 2) return;
-
-    const options: Record<string, any> = {};
+    const options: Record<string, any> = { safeSearch };
     const regex = /([a-zA-Z_]+)=([\w]+)/g;
-    options.safeSearch = safeSearch;
-
+    
+    if (query.length < 2) return;
     if (typeof args == "string" && args.length) {
       const matches = args.matchAll(regex);
       for (const match of matches) 
@@ -43,11 +42,16 @@
 
 
 <!-- Search Bar -->
-<div class="flex w-1/3 mx-auto pt-8 flex-col justify-center" style="min-width: 300px;">
-  <img class="w-1/3 mb-4 mx-auto hidden md:block drop-shadow-xl" src={imgUrl} alt="logo"/>
+<div class="flex w-72 md:w-1/3 mx-auto pt-8 flex-col justify-center">
+  {#if !results}
+    <img class="w-1/3 mt-56 mb-6 mx-auto hidden md:block drop-shadow-xl" 
+      out:fade={{ duration: 200 }}
+      src={imgUrl} 
+      alt="logo"/>
+  {/if}
   <Input placeholder="Search The Library..." 
+    on:submit={submitQuery}
     bind:value={query}
-    on:change={submitQuery}
     label="The Library"> 
     <span slot="right" class="flex flex-row gap-2 justify-center">
       <Button disabled={typeof query != "string" || query.length < 3} on:click={submitQuery}>
@@ -77,12 +81,12 @@
       Search Options
     </p>
     <div class="flex flex-row justify-between p-0 mb-2 px-2">
-      <p class="uppercase text-sm font-bold" style="color: #8e9297;">Safe Search</p>
+      <Label>Safe Search</Label>
       <Switch bind:checked={safeSearch}></Switch>
     </div>
     <Input on:change={() => localStorage.setItem("search-args", args)}
       placeholder="key=value; foo=bar..." 
-      label="Additional Server args"
+      label="Additional Search Args"
       bind:value={args} />
   </Modal>
 {/if}

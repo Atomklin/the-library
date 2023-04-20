@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import Label from "../typography/Label.svelte";
 
   export let placeholder = "";
   export let label = "";
@@ -11,15 +12,16 @@
 
 <div class="flex flex-col w-full">
   {#if label.length}
-    <p class="ml-2 mb-2 text-sm font-bold uppercase select-none">
+    <Label class="ml-2 mb-2">
       {label}
-    </p>
+    </Label>
   {/if}
   <span class="flex flex-col md:flex-row gap-2">
     <slot name="left" />
     <input 
       class="rounded-md border-1 border-solid block text-lg font-normal m-0 p-2 w-full" 
-      on:change={() => dispatch("change", value)}
+      on:keydown={(e) => { if (e.key == "Enter") dispatch("submit", value) }}
+      on:change={() => dispatch("change", value) }
       placeholder={placeholder} 
       type="text"
       bind:value/>
@@ -29,7 +31,6 @@
 
 
 <style>
-  p { color: #8e9297; }
   input {
     transition: border-color 0.2s ease-in-out;
     background-color: rgba(0, 0, 0, 0.1);
