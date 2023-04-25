@@ -6,7 +6,7 @@
   import Button from "../Common/forms/Button.svelte";
   import Input from "../Common/forms/Input.svelte";
   import Modal from "../Common/Modal.svelte";
-  import imgUrl from "/logo.svg";
+  import imgUrl from "../../static/logo.svg";
   import { search } from "../Data/api";
   
   import type { SearchResponse } from "../Data/types";

@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-const databaseDir = join(__dirname, "..", "..", "database");
+const databaseDir = process.env["DATABASE_DIR"] ?? join(__dirname, "..", "..", "database");
 const fullpath = join(databaseDir, "database.db");
 if (!existsSync(databaseDir)) 
   mkdirSync(databaseDir);

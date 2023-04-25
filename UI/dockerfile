@@ -1,0 +1,15 @@
+#syntax=docker/dockerfile:1
+# Build Stage
+FROM node:18-alpine as build
+WORKDIR /ui
+
+COPY . .
+RUN npm clean-install && \
+  npm run build
+
+# Production Stage
+FROM nginx:stable-alpine as production
+COPY --from=build /ui/nginx.conf /etc/nginx/conf.d
+COPY --from=build /ui/dist /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]

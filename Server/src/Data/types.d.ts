@@ -22,3 +22,13 @@ export interface Video {
   size?: number;
 }
 
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      DATABASE_DIR?: string;
+      HOST_NAME?: string;
+      PORT?: string;
+    }
+  } 
+}

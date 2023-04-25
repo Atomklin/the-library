@@ -1,0 +1,12 @@
+services:
+  website:
+    build: ./UI
+
+  api:
+    build: ./Server
+    deploy:
+      restary_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s

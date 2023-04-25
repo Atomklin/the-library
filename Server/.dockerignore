@@ -1,0 +1,13 @@
+# directories
+node_modules/
+database/
+.vscode/
+build/
+
+# files
+.eslintignore
+.eslintrc.json
+.gitignore
+
+.dockerignore
+dockerfile

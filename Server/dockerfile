@@ -1,0 +1,18 @@
+#syntax=docker/dockerfile:1
+# Build Stage
+FROM node:18-alpine as build
+WORKDIR /server
+
+COPY . .
+RUN npm clean-install && \
+  npm exec tsc
+
+# Production Stage
+FROM node:18-alpine as production
+WORKDIR /server
+
+COPY --from=build /server/build build/
+COPY --from=build /server/package*.json .
+
+ENV NODE_ENV=production
+CMD ["node", "."]

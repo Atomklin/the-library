@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "main": "build/main.js",
   "scripts": {
-    "start": "tsc && node ."
+    "dev": "tsc && node ."
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.4",
