@@ -16,16 +16,16 @@
   {#await results}
     <Loading />
   {:then results} 
-  {#if results.length}
-    <div class="flex flex-col">
-      {#each results as result (result.id)}
-        <Card {result}/>    
-      {/each}    
-    </div>
-  {:else}
-    <!-- No results -->
-    <!-- @todo -->
-  {/if}
+    {#if results.length}
+      <div class="flex flex-col gap-3">
+        {#each results as result (result.id)}
+          <Card {result}/>    
+        {/each}    
+      </div>
+    {:else}
+      <!-- No results -->
+      <!-- @todo -->
+    {/if}
   {:catch error}
     <Error class="mx-4">
       <b>Error: </b>

@@ -1,18 +1,27 @@
 import type { SearchResponse } from "./types";
 
-export async function search(query: string, options?: Record<string, any>) {
-  const headers = new Headers();
-  headers.set("Content-Type", "application/json");
+export async function search(query: string, safeSearch?: boolean, args?: string): Promise<SearchResponse> {
+  const options: Record<string, string> = { 
+    // Store boolean as number
+    safe_search: Number(safeSearch).toString() 
+  };
 
-  const res = await fetch("/api/search", {
-    body: JSON.stringify({ query, options }),
-    headers: headers,
-    method: "POST",
-  });
-  
-  const text = await res.text();
-  if (res.status != 200) throw Error(`Status Code ${res.status} - ${res.statusText}`);
-  if (!text) throw Error("Invalid Response from Server");
+  if (args) {
+    const regex = /([a-zA-Z_]+)=([\w]+)/g
+    const matches = args.matchAll(regex);
+    for (const [, key, value] of matches)
+      options[key] = value;
+  }
 
-  return JSON.parse(text) as SearchResponse;
+  const params = new URLSearchParams({
+    ...options,
+    query
+  })
+
+  const url = "/api/search?" + params
+  const res = await fetch(url, { method: "GET" });
+  if (!res.ok) 
+    throw Error(`Status Code ${res.status} - ${res.statusText}`);
+
+  return res.json();
 }

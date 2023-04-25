@@ -1,1 +1,1 @@
-wt --title "The Library" -d .\UI Powershell npm run dev ; new-tab -V -d .\Server Powershell npm run start
+wt --title "The Library" -d .\UI cmd /k npm run dev ; split-pane -V -d .\Server cmd /k npm start

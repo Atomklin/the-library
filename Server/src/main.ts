@@ -6,9 +6,6 @@ const app = express();
 const port = 6969;
 
 app.disable("x-powered-by");
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
 app.use("/api/search", search);
 
 app.listen(port, () => 

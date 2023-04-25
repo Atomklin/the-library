@@ -1,36 +1,37 @@
 <script lang="ts">
-  import type { Result } from "../../Data/types";
-  export let result: Result;
+  import type { File } from "../../Data/types";
+  export let result: File;
 
-  const data = result;
-  const tags = [data.type, ...data.tags.slice(0, 5)];
-  const concatString = (str: string, max: number) =>
-    str.length > max 
-      ? str.slice(0, max - 3) + "..." 
-      : str;
+  const data = result;  
+  const tags = result.tags.split(" ");
+  const thumbnail = result.thumbnail 
+    ?? "https://placehold.co/274x154/png";
 </script>
 
 
 <div class="card cursor-pointer overflow-hidden select-none rounded-lg px-3 py-5 flex flex-col lg:flex-row gap-1 lg:gap-4">
-  <span class="image-container rounded-md overflow-hidden hover:scale-105 bg-black shrink-0">
-    <img class="w-full h-full object-contain" src={data.thumbnail} alt={data.title}>
-  </span>
+  <div class="image-container rounded-md overflow-hidden hover:scale-105 bg-black shrink-0">
+    <img decoding="auto" class="w-full h-full object-contain" src={thumbnail} alt={data.name}>
+  </div>
   <div class="flex w-full pr-2 flex-col justify-between duration-500">
-    <span>
+    <div>
       <h1 class="text-lg font-semibold text-white">
-        {concatString(data.title, 50)}
+        {data.name}
       </h1> 
       <p class="text-zinc-400 hidden md:block">
-        {concatString(data.description, 150)}
+        {data.description ?? "No file descriptions."}
       </p>
-    </span>
-    <span class="flex gap-1 mt-2 md:mt-0">
+    </div>
+    <div class="flex gap-1 mt-2 md:mt-0">
+      <div class="type rounded-lg px-2 py-1 text-ts text-xs bg-zinc-700">
+        {data.type}
+      </div>
       {#each tags as tag}
-        <span class="tag rounded-lg px-2 py-1 text-xs">
+        <div class="tag rounded-lg px-2 py-1 text-xs">
           {tag}
-        </span>
+        </div>
       {/each}
-    </span>
+    </div>
   </div>
 </div>
 

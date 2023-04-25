@@ -3,8 +3,8 @@
   import Label from "../typography/Label.svelte";
 
   export let placeholder = "";
+  export let value: string;
   export let label = "";
-  export let value;
 
   const dispatch = createEventDispatcher();
 </script>

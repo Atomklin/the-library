@@ -1,5 +1,3 @@
-export type SearchResponse = File[];
-
 export interface File {
   readonly id: number;
   name: string;
@@ -23,3 +21,4 @@ export interface Video {
   duration_ms?: number;
   size?: number;
 }
+
