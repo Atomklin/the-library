@@ -9,7 +9,7 @@ RUN npm clean-install && \
 
 # Production Stage
 FROM nginx:stable-alpine as production
-COPY --from=build /ui/nginx.conf /etc/nginx/conf.d
+COPY --from=build /ui/nginx.conf /etc/nginx/
 COPY --from=build /ui/dist /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]

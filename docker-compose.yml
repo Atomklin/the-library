@@ -1,12 +1,36 @@
 services:
   website:
+    container_name: website
     build: ./UI
+    volumes:
+      - type: bind
+        source: ./Static
+        target: /usr/share/nginx/static
+    networks:
+      - default
+    ports:
+      - 80:80
+    depends_on:
+      - api
 
   api:
+    container_name: api
     build: ./Server
     deploy:
-      restary_policy:
+      restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 3
         window: 120s
+    environment:
+      - DATABASE_DIR=./database
+      - STATIC_DIR=./static
+    volumes:
+      - type: bind
+        source: ./Database
+        target: /server/database
+      - type: bind
+        source: ./Static
+        target: /server/static
+    networks:
+      - default

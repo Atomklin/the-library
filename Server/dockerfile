@@ -15,4 +15,6 @@ COPY --from=build /server/build build/
 COPY --from=build /server/package*.json .
 
 ENV NODE_ENV=production
+RUN npm clean-install 
+
 CMD ["node", "."]

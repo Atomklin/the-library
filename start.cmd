@@ -1,1 +1,0 @@
-wt --title "The Library" -d .\UI cmd /k npm run dev ; split-pane -V -d .\Server cmd /k npm start
