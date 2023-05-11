@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-const databaseDir = join(process.cwd(), process.env["DATABASE_DIR"]);
+const databaseDir = join(process.cwd(), process.env["DATABASE_DIR"].trim());
 const fullpath = join(databaseDir, "database.db");
 if (!existsSync(databaseDir)) 
   mkdirSync(databaseDir);
@@ -14,8 +14,9 @@ database.pragma("synchronous = NORMAL");
 database.pragma("foreign_keys = ON");
 
 database.exec(
-  "CREATE TABLE IF NOT EXISTS files (" +
+  "CREATE TABLE IF NOT EXISTS indexed_items (" +
     "id           INTEGER PRIMARY KEY NOT NULL, " +
+    "location     TEXT NOT NULL UNIQUE, " +
     "name         TEXT NOT NULL, " +
     "type         TEXT NOT NULL, " +
     "nsfw         INTEGER DEFAULT 0, " + // boolean 0 or 1
@@ -26,45 +27,32 @@ database.exec(
 );
 
 database.exec(
-  "CREATE TABLE IF NOT EXISTS galleries (" +
-    "id        INTEGER NOT NULL, " +
-    "page_num  INTEGER NOT NULL, " +
-    "location  TEXT NOT NULL, " +
-    "size      INTEGER, " +
-    "PRIMARY KEY (id, page_num), " +
-    "FOREIGN KEY (id) " +
-      "REFERENCES files (id) " +
+  "CREATE TABLE IF NOT EXISTS grouped_items (" +
+    "id        INTEGER PRIMARY KEY NOT NULL," +
+    "location  TEXT NOT NULL UNIQUE, " +
+    "group_id  INTEGER NOT NULL, " +
+    "type      TEXT NOT NULL, " +
+    "thumbnail TEXT, " +
+    "FOREIGN KEY (group_id) " +
+      "REFERENCES indexed_items (id) " +
         "ON DELETE CASCADE " +
         "ON UPDATE NO ACTION" +
-  ");"
-);
-
-database.exec(
-  "CREATE TABLE IF NOT EXISTS videos (" +
-    "id           INTEGER PRIMARY KEY, " + 
-    "location     TEXT NOT NULL, " +
-    "duration_ms  INTEGER, " +
-    "size         INTEGER, " +
-    "FOREIGN KEY (id) " +
-      "REFERENCES files (id) " +
-      "ON DELETE CASCADE " +
-      "ON UPDATE NO ACTION" +
   ");"
 );
 
 // Using Porter Stemming tokenizer 
 // Info : https://www.sqlite.org/fts3.html#tokenizer
 database.exec(
-  "CREATE VIRTUAL TABLE IF NOT EXISTS files_index "  +
+  "CREATE VIRTUAL TABLE IF NOT EXISTS fts_indexed_items "  +
   "USING fts5(id UNINDEXED, name, description, tags, tokenize=porter);"
 );
 
-// Index the data being inserted into files
+// Index the data being inserted into indexed_items
 database.exec(
-  "CREATE TRIGGER IF NOT EXISTS after_files_insert " +
-  "AFTER INSERT ON files " + 
+  "CREATE TRIGGER IF NOT EXISTS after_indexed_items_insert " +
+  "AFTER INSERT ON indexed_items " + 
   "BEGIN " +
-    "INSERT INTO files_index (" +
+    "INSERT INTO fts_indexed_items (" +
       "id, " +
       "name, " +
       "description, " +
@@ -80,10 +68,10 @@ database.exec(
 
 // Update index table when original table is updated
 database.exec(
-  "CREATE TRIGGER IF NOT EXISTS after_files_update " +
-  "AFTER UPDATE ON files " +
+  "CREATE TRIGGER IF NOT EXISTS after_indexed_items_update " +
+  "AFTER UPDATE ON indexed_items " +
   "BEGIN " +
-    "UPDATE files_index "  +
+    "UPDATE fts_indexed_items "  +
     "SET " +
       "name = NEW.name, " +
       "description = NEW.description, " +
@@ -94,10 +82,10 @@ database.exec(
 
 // Delete index when the original row is deleted
 database.exec(
-  "CREATE TRIGGER IF NOT EXISTS after_files_delete " +
-  "AFTER DELETE ON files " +
+  "CREATE TRIGGER IF NOT EXISTS after_indexed_items_delete " +
+  "AFTER DELETE ON indexed_items " +
   "BEGIN " +
-    "DELETE FROM files_index " +
+    "DELETE FROM fts_indexed_items " +
     "WHERE id = OLD.id; " +
   "END;"
 );

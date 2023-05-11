@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "main": "build/main.js",
   "scripts": {
-    "dev": "tsc && set DATABASE_DIR=../Database&& set STATIC_DIR=../Static&& node ."
+    "dev": "tsc && set DATABASE_DIR=../Database && set STATIC_DIR=../Static && node ."
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.4",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^8.3.0",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "got-scraping": "^3.2.13"
   }
 }

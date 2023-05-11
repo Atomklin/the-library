@@ -3,7 +3,7 @@
   export let result: File;
 
   const data = result;  
-  const tags = result.tags.split(" ");
+  const tags = result.tags ? result.tags.split(" ") : [];
   const thumbnail = result.thumbnail 
     ?? "https://placehold.co/274x154/png";
 </script>

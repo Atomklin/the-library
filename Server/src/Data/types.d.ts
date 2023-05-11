@@ -1,33 +1,30 @@
-export interface File {
-  readonly id: number;
-  name: string;
-  type: "Video" | "Gallery";
-  nsfw: 0 | 1;
-  description?: string;
+export type ItemType = "Collection" | "Video" | "Image" | "Audio" | "Unknown";
+
+interface BaseItem {
+  id:         string;
+  location:   string;
   thumbnail?: string;
-  tags?: string;
+  type:       ItemType;
 }
 
-export interface Gallery {
-  readonly id: number;
-  page_num: number;
-  location: string;
-  size?: number;
+export type IndexedItem = BaseItem & {
+  nsfw:         0 | 1;
+  description?: string;
+  tags?:        string;
 }
 
-export interface Video {
-  readonly id: number;
-  location: string;
-  duration_ms?: number;
-  size?: number;
+export type GroupedItem = BaseItem & {
+  group_id: number;
 }
-
 
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
       DATABASE_DIR: string;
       STATIC_DIR: string;
+
+      FFPROBE?: string;
+      FFMPEG?: string;
     }
   } 
 }

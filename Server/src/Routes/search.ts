@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import database from "../Data/database";
-import { File } from "../Data/types";
+import { IndexedItem } from "../Data/types";
 
 const router = Router();
 router.get("/", (req, res) => {
@@ -13,21 +13,21 @@ router.get("/", (req, res) => {
     return res.sendStatus(400);
 
   const results = database.prepare(
-    "SELECT * FROM files f " +
-    "INNER JOIN files_index i ON i.id = f.id " +
+    "SELECT * FROM indexed_items f " +
+    "INNER JOIN fts_indexed_items i ON i.id = f.id " +
     "WHERE " +
-      "files_index MATCH ? " + 
+      "fts_indexed_items MATCH ? " + 
       (safeSearch ?  "AND f.nsfw = 0 " : "") +
     "ORDER BY " +
-      "bm25(files_index, ?, ?, ?) " +
+      "bm25(fts_indexed_items, ?, ?, ?) " +
     "LIMIT ?;"
   ).all(
     query, 
     Number(params.name_weight) || 1,
     Number(params.description_weight) || 5,
     Number(params.tags_weight) || 4,
-    Number(params.limit) || 25,
-  ) as File[];
+    Number(params.limit) || 25
+  ) as IndexedItem[];
 
   res.json(results);
 });
