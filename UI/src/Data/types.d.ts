@@ -1,25 +1,25 @@
-export type SearchResponse = File[];
+export type SearchResponse = Item[];
 
-export interface File {
-  readonly id: number;
-  name: string;
-  type: "Video" | "Gallery";
-  nsfw: 0 | 1;
-  description?: string;
+export type ItemType = "Collection" | "Video" | "Image" | "Audio" | "Unknown";
+
+interface BaseItem {
+  id:         string;
+  location:   string;
   thumbnail?: string;
-  tags?: string;
+  type:       ItemType;
 }
 
-export interface Gallery {
-  readonly id: number;
-  page_num: number;
-  location: string;
-  size?: number;
+export type Item = BaseItem & {
+  nsfw:         0 | 1;
+  name:         string;
+  description?: string;
+  tags:         string[];
 }
 
-export interface Video {
-  readonly id: number;
-  location: string;
-  duration_ms?: number;
-  size?: number;
+export type CollectionItem = BaseItem & {
+  group_id: number;
 }
+
+export type VisibleModal = 
+  "search-options" | 
+  "video-player";

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { File } from "../../Data/types";
-  export let result: File;
+  import type { Item } from "../../Data/types";
+  export let result: Item;
 
   const data = result;  
-  const tags = result.tags ? result.tags.split(" ") : [];
-  const thumbnail = result.thumbnail 
-    ?? "https://placehold.co/274x154/png";
+  const thumbnail = data.type != "Image" 
+    ? data.thumbnail ?? "https://placehold.co/274x154/png"
+    : data.location;
 </script>
 
 
@@ -26,7 +26,7 @@
       <div class="type rounded-lg px-2 py-1 text-ts text-xs bg-zinc-700">
         {data.type}
       </div>
-      {#each tags as tag}
+      {#each data.tags as tag}
         <div class="tag rounded-lg px-2 py-1 text-xs">
           {tag}
         </div>

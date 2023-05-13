@@ -1,33 +1,32 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
-  import Label from "../Common/typography/Label.svelte";
-  import Switch from "../Common/forms/Switch.svelte";
-  import Button from "../Common/forms/Button.svelte";
-  import Input from "../Common/forms/Input.svelte";
-  import Modal from "../Common/Modal.svelte";
-  import imgUrl from "../../static/logo.svg";
-  import { search } from "../Data/api";
+  import Button from "../../Common/forms/Button.svelte";
+  import Input from "../../Common/forms/Input.svelte";
+  import OptionsModal from "./OptionsModal.svelte";
+  import imgUrl from "../../../static/logo.svg";
   
-  import type { SearchResponse } from "../Data/types";
+  import { parseKeyValuePairs } from "../../Data/utils";
+  import { visibleModal } from "../../Data/stores";
+  import { search } from "../../Data/api";
+  
+  import type { SearchResponse } from "../../Data/types";
   export let results: Promise<SearchResponse> | SearchResponse;
 
-  let args = localStorage.getItem("search-args");
-  let showOptions = false;
-  let safeSearch = true;
+  let args = localStorage.getItem("search-options");
   let query: string;
-
-  function submit() {
-    results = search(query, safeSearch, args);
-  }
+  
+  function submit() { 
+    if (query.length < 3) return;
+    results = search(query, parseKeyValuePairs(args))
+  };
 </script>
-
 
 <!-- Search Bar -->
 <div class="flex w-72 md:w-1/3 mx-auto pt-8 flex-col justify-center">
   {#if !results}
     <img class="w-1/3 mt-56 mb-6 mx-auto hidden md:block drop-shadow-xl" 
-      out:fade={{ duration: 200 }}
+      out:fade={{ duration: 150 }}
       src={imgUrl} 
       alt="logo"/>
   {/if}
@@ -36,7 +35,7 @@
     bind:value={query}
     label="The Library"> 
     <span slot="right" class="flex flex-row gap-2 justify-center">
-      <Button disabled={typeof query != "string" || query.length < 3} on:click={submit}>
+      <Button disabled={typeof query != "string" || query.length < 3} on:escape={submit}>
         <svg xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -48,7 +47,7 @@
             stroke-width="2" />
         </svg>
       </Button>
-      <Button on:click={() => showOptions = true}>
+      <Button on:escape={() => visibleModal.set("search-options")}>
         <svg xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -65,18 +64,4 @@
 </div>
 
 <!-- Search Options Modal -->
-{#if showOptions}
-  <Modal bind:show={showOptions}>
-    <p class="text-lg font-bold border-b uppercase select-none pb-4 w-96 mb-4">
-      Search Options
-    </p>
-    <div class="flex flex-row justify-between p-0 mb-2 px-2">
-      <Label>Safe Search</Label>
-      <Switch bind:checked={safeSearch}></Switch>
-    </div>
-    <Input on:change={() => localStorage.setItem("search-args", args)}
-      placeholder="key=value; foo=bar..." 
-      label="Additional Search Args" 
-      bind:value={args} />
-  </Modal>
-{/if}
+<OptionsModal bind:args />

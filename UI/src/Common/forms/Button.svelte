@@ -17,7 +17,7 @@
 
 
 <button class="{theme} border-0 rounded py-1 px-4 cursor-pointer font-medium text-base flex justify-center items-center active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
-  on:click={(e) => { if (!disabled) dispatch("click", e) }}
+  on:click={(e) => { if (!disabled) dispatch("escape", e) }}
   {disabled}>
   <slot></slot>
 </button>

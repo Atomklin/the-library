@@ -2,7 +2,7 @@
   import type { SearchResponse } from "./Data/types";
   
   import Results from "./Sections/results/Results.svelte";
-  import Search from "./Sections/Search.svelte";
+  import Search from "./Sections/search/Search.svelte";
   
   let results: Promise<SearchResponse> | SearchResponse;
 </script>

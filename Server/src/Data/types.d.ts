@@ -8,6 +8,7 @@ interface BaseItem {
 }
 
 export type IndexedItem = BaseItem & {
+  name:         string;
   nsfw:         0 | 1;
   description?: string;
   tags?:        string;
@@ -23,6 +24,8 @@ declare global {
       DATABASE_DIR: string;
       STATIC_DIR: string;
 
+      DEFAULT_THUMBNAIL?: string;
+      
       FFPROBE?: string;
       FFMPEG?: string;
     }

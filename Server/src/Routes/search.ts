@@ -4,15 +4,16 @@ import database from "../Data/database";
 import { IndexedItem } from "../Data/types";
 
 const router = Router();
+
 router.get("/", (req, res) => {
   const params = req.query;
   const query = String(params.query);
-  const safeSearch = Number(params.safe_search) || 0;
+  const safeSearch = Number(params.safe_search) || 1;
 
   if (!query || !query.length) 
     return res.sendStatus(400);
 
-  const results = database.prepare(
+  const raw = database.prepare(
     "SELECT * FROM indexed_items f " +
     "INNER JOIN fts_indexed_items i ON i.id = f.id " +
     "WHERE " +
@@ -27,9 +28,12 @@ router.get("/", (req, res) => {
     Number(params.description_weight) || 5,
     Number(params.tags_weight) || 4,
     Number(params.limit) || 25
-  ) as IndexedItem[];
+  ) as IndexedItem[]; 
 
-  res.json(results);
+  res.json(raw.map(({ tags, ...others }) => ({
+    tags: tags ? tags.split(/ +/g) : [],
+    ...others
+  })));
 });
 
 
