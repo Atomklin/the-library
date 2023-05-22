@@ -36,7 +36,7 @@ start-prod.cmd # or docker compose up -d
 
 ## Usage
 - The TypeScript backend server handles API requests and database operations.
-- The Nginx static file server serves static files (HTML, video, audio etc.) from the `./Static` directory.
+- The Nginx static file server serves static files (HTML, video, audio etc.) from the `./Data/files` directory.
 - The SQLite search engine provides search functionality for the application.
 
 ## Contributing

@@ -1,30 +1,30 @@
-export type ItemType = "Collection" | "Video" | "Image" | "Audio" | "Unknown";
+import { ItemType } from "./database";
 
-interface BaseItem {
-  id:         string;
-  location:   string;
-  thumbnail?: string;
-  type:       ItemType;
+export interface Item {
+  id:           number;
+  path:         string;
+  type:         ItemType,
+  name:         string;
+  nsfw:         0 | 1;
+  group_id:     number;
+  description?: string;
+  thumbnail?:   string;
 }
 
-export type IndexedItem = BaseItem & {
+export interface Groups {
+  id:           number;
   name:         string;
   nsfw:         0 | 1;
   description?: string;
-  tags?:        string;
+  thumbnail?:   string;
 }
 
-export type GroupedItem = BaseItem & {
-  group_id: number;
-}
+export type Result = Item;
 
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      DATABASE_DIR: string;
-      STATIC_DIR: string;
-
-      DEFAULT_THUMBNAIL?: string;
+      DATA_DIR: string;
       
       FFPROBE?: string;
       FFMPEG?: string;

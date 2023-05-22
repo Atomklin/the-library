@@ -5,46 +5,50 @@ import { join } from "node:path";
 
 import { downloadFFmpeg, downloadFFprobe, ffmpegPath, ffprobePath } from "../All-Purpose/ffmpeg";
 import { generateGridThumbnail, GridThumnailCreatorOptions } from "../All-Purpose/thumnail";
-import { pathToURLPathname, staticDir } from "./common";
-import database from "./database";
+import { dataDir, pathToURLPathname } from "./common";
+import database, { ItemType } from "./database";
 
 export async function generateVideoThumbnails(options: Omit<GridThumnailCreatorOptions, "output"> = {}) {
-  const thumbnailDir = join(staticDir, ".cache");
+  const thumbnailDir = join(dataDir, "files",  ".cache");
 
   if (!existsSync(thumbnailDir)) await mkdir(thumbnailDir);
   if (!existsSync(ffprobePath)) await downloadFFprobe();
   if (!existsSync(ffmpegPath)) await downloadFFmpeg();
 
-  async function createThumbnails(table: string) {
-    const inputs = database.prepare(
-      "SELECT id, location FROM " + table +
-      " WHERE type = 'Video' AND thumbnail IS NULL;"
-    ).all() as { location: string, id: string }[];
+  const itemPaths = database.prepare(
+    "SELECT path FROM items " +
+    "WHERE thumbnail IS NULL AND type = ?;"
+  ).all(ItemType.Video) as { path: string }[];
 
-    const update = database.prepare(
-      "UPDATE " + table + " SET thumbnail = ? WHERE id = ?;"
-    );
+  const insertThumbnail = database.prepare(
+    "UPDATE items SET thumbnail = ? " +
+    "WHERE path = ?;"
+  );
 
-    for (const { location, id } of inputs) {
-      try {
-        const output = join(thumbnailDir, randomUUID() + ".png");
-        await generateGridThumbnail(join(staticDir, location), { output, ...options });
-        update.run(pathToURLPathname(output), id);
-      } catch (e) {
-        console.error(e);
-      }
+  for (const { path } of itemPaths) {
+    const input = join(dataDir, path);
+    const output = join(thumbnailDir, randomUUID() + ".png");
+
+    try {
+      await generateGridThumbnail(input, { output, ...options });  
+      insertThumbnail.run(pathToURLPathname(output), path);
+    } catch (e) {
+      console.error(e);
     }
   }
-    
-  await createThumbnails("indexed_items");
-  await createThumbnails("grouped_items");
 
-  database.exec(
-    "UPDATE indexed_items " +
-    "SET thumbnail = (" +
-      "SELECT location FROM grouped_items g " +
-      "WHERE g.group_id = indexed_items.id AND g.type = 'Image' " +
+  // Set Image Thumbnails to their path
+  database.prepare(
+    "UPDATE items SET thumbnail = path " +
+    "WHERE thumbnail IS NULL AND type = ?;"
+  ).run(ItemType.Image);
+
+  // Set thumbnail of groups to the first item on the group's thumbnail
+  database.prepare(
+    "UPDATE groups SET thumbnail = (" +
+      "SELECT thumbnail FROM items " +
+      "WHERE thumbnail IS NOT NULL " +
       "LIMIT 1" +
-    ") WHERE type = 'Collection';"
-  );
+    ");"
+  ).run();
 }
