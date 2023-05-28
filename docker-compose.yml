@@ -4,8 +4,8 @@ services:
     build: ./UI
     volumes:
       - type: bind
-        source: ./Static
-        target: /usr/share/nginx/static
+        source: ./Data/files
+        target: /usr/share/nginx/files
     networks:
       - default
     ports:
@@ -23,14 +23,11 @@ services:
         max_attempts: 3
         window: 120s
     environment:
-      - DATABASE_DIR=./database
-      - STATIC_DIR=./static
+      - DATABASE_DIR=./Data
+      - FILES_DIR=./Data/files
     volumes:
       - type: bind
-        source: ./Database
-        target: /server/database
-      - type: bind
-        source: ./Static
-        target: /server/static
+        source: ./Data
+        target: /server/Data
     networks:
       - default

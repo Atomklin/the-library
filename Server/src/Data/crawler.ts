@@ -1,81 +1,83 @@
-import { existsSync } from "node:fs";
-import { mkdir, readdir } from "node:fs/promises";
-import { join, normalize, parse } from "node:path";
+import { readdir } from "node:fs/promises";
+import { join, parse, relative, sep } from "node:path";
 
-import { crawlDir } from "../All-Purpose/filesystem";
-import { dataDir, pathToURLPathname } from "./common";
+import { filesDir, pathToURLPathname, thumbnailDir } from "./common";
 import database, { ItemType } from "./database";
 
-/** Crawls the "files" directory and saves the indexes to the database */
-export async function indexStaticDirectory() {
-  const dir = join(dataDir, "files");
-  if (!existsSync(dir))
-    return mkdir(dir);
-
-  const dirents = await readdir(dir, { withFileTypes: true });
-  const insertItem = database.prepare(
-    "INSERT OR IGNORE INTO items (" +
-      "path, name, type" +
-    ") VALUES (?, ?, ?);"
-  );
-
-  const insertItemWithGroupId = database.prepare(
-    "INSERT OR IGNORE INTO items ("   +
-      "path, name, type, group_id" +
-    ") VALUES (?, ?, ?, (SELECT id FROM groups WHERE path = ?));"
-  );
-
+/** Crawls the `FILES_DIR` directory and saves the indexes to the database */
+export async function indexFilesDirectory() {
   const insertGroup = database.prepare(
     "INSERT OR IGNORE INTO groups (" +
       "path, name" +
     ") VALUES (?, ?);"
   );
 
+  const insertItemGroupMap = database.prepare(
+    "INSERT OR IGNORE INTO item_group_mapping (" +
+      "item_id, group_id" +
+    ") VALUES (" + 
+      "(SELECT id FROM items  WHERE path = ?), " +
+      "(SELECT id FROM groups WHERE path = ?));"
+  );
 
-  const insertCollection = database.transaction((dir: string, files: string[]) => {
-    insertGroup.run(
-      pathToURLPathname(dir), 
-      normalize(parse(dir).name)
+  const insertItem = database.prepare(
+    "INSERT OR IGNORE INTO items (" +
+      "path, name, type" +
+    ") VALUES (?, ?, ?);"
+  );
+
+
+  const subdirectoryQueue: string[] = [filesDir];
+  const indexFile = database.transaction((path: string) => {
+    const itemPath = pathToURLPathname(path);
+    const { dir, ext, name } = parse(path);
+
+    insertItem.run(
+      itemPath, name, 
+      resolveType(ext.substring(1))
     );
+    
+    // Directories are considered groups, and every directory
+    // a file is part of is considered a group it's part of.
+    const directories = relative(filesDir, dir).split(sep);
+    let currentDirectory = "/files";
+    
+    for (const directory of directories) {
+      if (!directory.length) return;
 
-    for (const file of files) 
-      insertItemWithGroupId.run(
-        pathToURLPathname(file),
-        normalize(parse(file).name),
-        resolveType(file),
-        dir
-      );
-  });
-
-  for (const dirent of dirents) {
-    if (/\.cache/.test(dirent.name)) 
-      continue;
-
-    const fullpath = join(dir, dirent.name);
-    if (dirent.isFile()) 
-      insertItem.run(
-        pathToURLPathname(fullpath),
-        normalize(parse(dirent.name).name),
-        resolveType(dirent.name)
-      );
-
-    else if (dirent.isDirectory()) {
-      const files = await crawlDir(fullpath);
-      insertCollection(fullpath, files);
+      currentDirectory += "/" + directory;
+      insertGroup.run(currentDirectory, directory);
+      insertItemGroupMap.run(itemPath, currentDirectory);
     }
-  }
+  });
+  
+
+  do {
+    const subdirectory = subdirectoryQueue.shift()!;
+    const dirents = await readdir(subdirectory, { withFileTypes: true });
+
+    for (const dirent of dirents) {
+      const fullPath = join(subdirectory, dirent.name);
+
+      if (fullPath == thumbnailDir) continue;
+      if (dirent.isDirectory())
+        subdirectoryQueue.push(fullPath);
+      else if (dirent.isFile()) 
+        indexFile(fullPath);
+    }
+
+  } while (subdirectoryQueue.length);
 }
 
 
-const videoExtension = new Set(["mp4", "mov", "wmv", "webm", "avi", "flv", "mkv", "mts"]);
-const imageExtension = new Set(["png", "avif", "gif", "jpg", "jpeg", "svg", "webp"]);
-const audioExtension = new Set(["wav", "mp3", "aac", "aacp", "ogg", "flac"]);
+// Most common file extensions
+const videoExtensions = new Set(["mp4", "mov", "wmv", "webm", "avi", "flv", "mkv", "mts"]);
+const imageExtensions = new Set(["png", "avif", "gif", "jpg", "jpeg", "svg", "webp"]);
+const audioExtensions = new Set(["wav", "mp3", "aac", "aacp", "ogg", "flac"]);
 
-export function resolveType(path: string) {
-  const ext = parse(path).ext.substring(1);
-  
-  if (videoExtension.has(ext)) return ItemType.Video;
-  if (imageExtension.has(ext)) return ItemType.Image;
-  if (audioExtension.has(ext)) return ItemType.Audio;
+export function resolveType(ext: string) {
+  if (videoExtensions.has(ext)) return ItemType.Video;
+  if (imageExtensions.has(ext)) return ItemType.Image;
+  if (audioExtensions.has(ext)) return ItemType.Audio;
   return ItemType.Unknown;
 }

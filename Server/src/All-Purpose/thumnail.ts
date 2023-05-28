@@ -1,10 +1,14 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { existsSync, statSync } from "node:fs";
 
 import { ffmpegPath, ffprobePath } from "./ffmpeg";
-import { assertFile } from "./filesystem";
 
 export async function generateGridThumbnail(path: string, options: GridThumnailCreatorOptions) {
-  assertFile(path);
+  if (!existsSync(path)) 
+    throw Error(path + " does not exist");
+
+  if (!statSync(path).isFile()) 
+    throw Error(path + " is not a file");
 
   const totalFrames = await countVideoFrames(path);
 

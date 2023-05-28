@@ -5,12 +5,10 @@ import { join } from "node:path";
 
 import { downloadFFmpeg, downloadFFprobe, ffmpegPath, ffprobePath } from "../All-Purpose/ffmpeg";
 import { generateGridThumbnail, GridThumnailCreatorOptions } from "../All-Purpose/thumnail";
-import { dataDir, pathToURLPathname } from "./common";
+import { databaseDir, pathToURLPathname, thumbnailDir } from "./common";
 import database, { ItemType } from "./database";
 
 export async function generateVideoThumbnails(options: Omit<GridThumnailCreatorOptions, "output"> = {}) {
-  const thumbnailDir = join(dataDir, "files",  ".cache");
-
   if (!existsSync(thumbnailDir)) await mkdir(thumbnailDir);
   if (!existsSync(ffprobePath)) await downloadFFprobe();
   if (!existsSync(ffmpegPath)) await downloadFFmpeg();
@@ -26,7 +24,7 @@ export async function generateVideoThumbnails(options: Omit<GridThumnailCreatorO
   );
 
   for (const { path } of itemPaths) {
-    const input = join(dataDir, path);
+    const input = join(databaseDir, path);
     const output = join(thumbnailDir, randomUUID() + ".png");
 
     try {
@@ -47,7 +45,9 @@ export async function generateVideoThumbnails(options: Omit<GridThumnailCreatorO
   database.prepare(
     "UPDATE groups SET thumbnail = (" +
       "SELECT thumbnail FROM items " +
-      "WHERE thumbnail IS NOT NULL " +
+      "INNER JOIN item_group_mapping ON item_group_mapping.item_id = items.id " + 
+      "WHERE item_group_mapping.group_id = groups.id " +
+        "AND items.thumbnail IS NOT NULL " +
       "LIMIT 1" +
     ");"
   ).run();

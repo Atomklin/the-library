@@ -24,7 +24,8 @@ export type Result = Item;
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      DATA_DIR: string;
+      DATABASE_DIR: string;
+      FILES_DIR: string;
       
       FFPROBE?: string;
       FFMPEG?: string;

@@ -2,9 +2,9 @@ import Database from "better-sqlite3";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { dataDir } from "./common";
+import { databaseDir } from "./common";
 
-const fullpath = join(dataDir, "database.db");
+const fullpath = join(databaseDir, "database.db");
 const database = new Database(fullpath);
 
 database.pragma("journal_mode = WAL"); // Performance improvement

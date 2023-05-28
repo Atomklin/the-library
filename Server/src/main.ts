@@ -1,6 +1,6 @@
 import express from "express";
 
-import { indexStaticDirectory } from "./Data/crawler";
+import { indexFilesDirectory } from "./Data/crawler";
 import { generateVideoThumbnails } from "./Data/thumbnailer";
 import search from "./Routes/search";
 
@@ -12,7 +12,7 @@ app.use("/api/search", search);
 
 
 void async function() {
-  await indexStaticDirectory();
+  await indexFilesDirectory();
   await generateVideoThumbnails();
   
   app.listen(port, () => 
