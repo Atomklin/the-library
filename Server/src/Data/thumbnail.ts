@@ -3,15 +3,18 @@ import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
-import { downloadFFmpeg, downloadFFprobe, ffmpegPath, ffprobePath } from "../All-Purpose/ffmpeg";
-import { generateGridThumbnail, GridThumnailCreatorOptions } from "../All-Purpose/thumnail";
+import { downloadFFmpeg, downloadFFprobe, ffmpegPath, ffProbePath } from "../All-Purpose/ffmpeg";
+import {
+  generateGridThumbnail, GridThumbnailCreatorOptions
+} from "../All-Purpose/thumbnail-creator";
 import { databaseDir, pathToURLPathname, thumbnailDir } from "./common";
 import database, { ItemType } from "./database";
 
-export async function generateVideoThumbnails(options: Omit<GridThumnailCreatorOptions, "output"> = {}) {
+export async function generateVideoThumbnails(options: Omit<GridThumbnailCreatorOptions, "output"> = {}) {
   if (!existsSync(thumbnailDir)) await mkdir(thumbnailDir);
-  if (!existsSync(ffprobePath)) await downloadFFprobe();
+  if (!existsSync(ffProbePath)) await downloadFFprobe();
   if (!existsSync(ffmpegPath)) await downloadFFmpeg();
+
 
   const itemPaths = database.prepare(
     "SELECT path FROM items " +
@@ -41,7 +44,7 @@ export async function generateVideoThumbnails(options: Omit<GridThumnailCreatorO
     "WHERE thumbnail IS NULL AND type = ?;"
   ).run(ItemType.Image);
 
-  // Set thumbnail of groups to the first item on the group's thumbnail
+  // Set thumbnail of group to the first item on the group's thumbnail
   database.prepare(
     "UPDATE groups SET thumbnail = (" +
       "SELECT thumbnail FROM items " +

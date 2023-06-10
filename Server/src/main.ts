@@ -1,7 +1,7 @@
 import express from "express";
 
 import { indexFilesDirectory } from "./Data/crawler";
-import { generateVideoThumbnails } from "./Data/thumbnailer";
+import { generateVideoThumbnails } from "./Data/thumbnail";
 import search from "./Routes/search";
 
 const app = express();

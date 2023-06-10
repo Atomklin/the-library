@@ -13,11 +13,11 @@ function getFullPath(name: string) {
 }
 
 async function downloadBinary(repo: string, name: string)  {
-  const fullpath = getFullPath(name);
+  const fullPath = getFullPath(name);
   
   if (!existsSync(binDir)) mkdirSync(binDir);
-  if (existsSync(fullpath))
-    return fullpath;
+  if (existsSync(fullPath))
+    return fullPath;
   
   const api = "https://api.github.com/repos";
   const url = `${api}/${repo}/contents/platforms/${sys}`;
@@ -29,11 +29,11 @@ async function downloadBinary(repo: string, name: string)  {
 
   await pipeline(
     gotScraping.stream(dlLink),
-    createWriteStream(fullpath)
+    createWriteStream(fullPath)
   );
 
-  chmodSync(fullpath, 0o755);
-  return fullpath;
+  chmodSync(fullPath, 0o755);
+  return fullPath;
 }
 
 interface File {
@@ -42,7 +42,7 @@ interface File {
 }
 
 
-export const ffprobePath = process.env["FFPROBE"] ?? getFullPath("ffprobe");
+export const ffProbePath = process.env["FFPROBE"] ?? getFullPath("ffprobe");
 export const ffmpegPath = process.env["FFMPEG"] ?? getFullPath("ffmpeg");
 
 export const downloadFFprobe = () => 

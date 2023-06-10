@@ -9,7 +9,7 @@ This project is strictly under development, with most of its core functionality 
 - Nginx File Hoster
 - Sqlite database for search functionality
 - Directory Crawler
-- FFmpeg Grid Thumnail maker
+- FFmpeg Grid Thumbnail maker
 
 ## Prerequisites
 Before running this project, make sure you have the following installed:

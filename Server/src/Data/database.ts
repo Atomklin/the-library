@@ -4,8 +4,8 @@ import { join } from "node:path";
 
 import { databaseDir } from "./common";
 
-const fullpath = join(databaseDir, "database.db");
-const database = new Database(fullpath);
+const fullPath = join(databaseDir, "database.db");
+const database = new Database(fullPath);
 
 database.pragma("journal_mode = WAL"); // Performance improvement
 database.pragma("synchronous = NORMAL");

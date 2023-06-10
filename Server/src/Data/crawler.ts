@@ -54,15 +54,15 @@ export async function indexFilesDirectory() {
 
   do {
     const subdirectory = subdirectoryQueue.shift()!;
-    const dirents = await readdir(subdirectory, { withFileTypes: true });
+    const dirent = await readdir(subdirectory, { withFileTypes: true });
 
-    for (const dirent of dirents) {
-      const fullPath = join(subdirectory, dirent.name);
+    for (const elem of dirent) {
+      const fullPath = join(subdirectory, elem.name);
 
       if (fullPath == thumbnailDir) continue;
-      if (dirent.isDirectory())
+      if (elem.isDirectory())
         subdirectoryQueue.push(fullPath);
-      else if (dirent.isFile()) 
+      else if (elem.isFile()) 
         indexFile(fullPath);
     }
 

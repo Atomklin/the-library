@@ -1,9 +1,9 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { existsSync, statSync } from "node:fs";
 
-import { ffmpegPath, ffprobePath } from "./ffmpeg";
+import { ffmpegPath, ffProbePath } from "./ffmpeg";
 
-export async function generateGridThumbnail(path: string, options: GridThumnailCreatorOptions) {
+export async function generateGridThumbnail(path: string, options: GridThumbnailCreatorOptions) {
   if (!existsSync(path)) 
     throw Error(path + " does not exist");
 
@@ -35,7 +35,7 @@ export async function generateGridThumbnail(path: string, options: GridThumnailC
 
 
 export async function countVideoFrames(path: string) {
-  const ffprobe = spawn(ffprobePath, [
+  const ffProbe = spawn(ffProbePath, [
     "-loglevel",       "fatal", 
     "-count_frames",      
     "-select_streams", "v", // Select the video stream
@@ -44,7 +44,7 @@ export async function countVideoFrames(path: string) {
     path
   ], { stdio: "pipe" });
 
-  const output = await promisifyChildProcess(ffprobe);
+  const output = await promisifyChildProcess(ffProbe);
   return parseInt(output);
 }
 
@@ -77,7 +77,7 @@ function promisifyChildProcess(child: ChildProcessWithoutNullStreams) {
 }
 
 
-export interface GridThumnailCreatorOptions {
+export interface GridThumbnailCreatorOptions {
   output:   string;
   columns?: number;
   rows?:    number;
