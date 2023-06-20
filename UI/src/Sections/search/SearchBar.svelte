@@ -1,31 +1,33 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-
+  
   import Button from "../../Common/forms/Button.svelte";
   import Input from "../../Common/forms/Input.svelte";
   import OptionsModal from "./OptionsModal.svelte";
   import imgUrl from "../../../static/logo.svg";
-  
-  import { parseKeyValuePairs } from "../../Data/utils";
-  import { visibleModal } from "../../Data/stores";
+
+  import type { ItemType, SearchResponse } from "../../Data/types";
   import { search } from "../../Data/api";
   
-  import type { SearchResponse } from "../../Data/types";
   export let results: Promise<SearchResponse> | SearchResponse;
 
-  let args = localStorage.getItem("search-options");
+  let isOptionsVisible: boolean;
+
+  let blacklist = new Set<ItemType>();
+  let safeSearch = true;
   let query: string;
   
   function submit() { 
     if (query.length < 3) return;
-    results = search(query, parseKeyValuePairs(args))
+    results = search({ query, safeSearch, blacklist });
   };
 </script>
+
 
 <!-- Search Bar -->
 <div class="flex w-72 md:w-1/3 mx-auto pt-8 flex-col justify-center">
   {#if !results}
-    <img class="w-1/3 mt-56 mb-6 mx-auto hidden md:block drop-shadow-xl" 
+    <img class="md:mt-56 mb-6 mx-auto drop-shadow-xl w-80" 
       out:fade={{ duration: 150 }}
       src={imgUrl} 
       alt="logo"/>
@@ -35,7 +37,7 @@
     bind:value={query}
     label="The Library"> 
     <span slot="right" class="flex flex-row gap-2 justify-center">
-      <Button disabled={typeof query != "string" || query.length < 3} on:escape={submit}>
+      <Button disabled={typeof query != "string" || query.length < 3} on:click={submit}>
         <svg xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -47,7 +49,7 @@
             stroke-width="2" />
         </svg>
       </Button>
-      <Button on:escape={() => visibleModal.set("search-options")}>
+      <Button on:click={() => isOptionsVisible = true}>
         <svg xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -64,4 +66,6 @@
 </div>
 
 <!-- Search Options Modal -->
-<OptionsModal bind:args />
+<OptionsModal bind:visible={isOptionsVisible} 
+  bind:safeSearch 
+  bind:blacklist/>

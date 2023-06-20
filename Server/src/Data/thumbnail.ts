@@ -8,7 +8,8 @@ import {
   generateGridThumbnail, GridThumbnailCreatorOptions
 } from "../All-Purpose/thumbnail-creator";
 import { databaseDir, pathToURLPathname, thumbnailDir } from "./common";
-import database, { ItemType } from "./database";
+import database from "./database";
+import { ItemType } from "./types";
 
 export async function generateVideoThumbnails(options: Omit<GridThumbnailCreatorOptions, "output"> = {}) {
   if (!existsSync(thumbnailDir)) await mkdir(thumbnailDir);
@@ -44,7 +45,7 @@ export async function generateVideoThumbnails(options: Omit<GridThumbnailCreator
     "WHERE thumbnail IS NULL AND type = ?;"
   ).run(ItemType.Image);
 
-  // Set thumbnail of group to the first item on the group's thumbnail
+  // Set thumbnail of the group to the first item in its collection with a thumbnail
   database.prepare(
     "UPDATE groups SET thumbnail = (" +
       "SELECT thumbnail FROM items " +

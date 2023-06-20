@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "main": "build/main.js",
   "scripts": {
-    "dev": "tsc && set DATABASE_DIR=../Data && set FILES_DIR=../Data/files && node ."
+    "dev": "set DATABASE_DIR=../Data && set FILES_DIR=../Data/files && tsc-watch --onSuccess \"node ./build/main.js\""
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.4",
@@ -13,6 +13,7 @@
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
     "eslint": "^8.38.0",
+    "tsc-watch": "^6.0.4",
     "typescript": "^5.0.4"
   },
   "dependencies": {

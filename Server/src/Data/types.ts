@@ -1,4 +1,10 @@
-import { ItemType } from "./database";
+export enum ItemType {
+  Unknown = 0,
+  Group = 1,
+  Video = 2,
+  Audio = 3,
+  Image = 4
+}
 
 export interface Item {
   id:           number;
@@ -6,7 +12,6 @@ export interface Item {
   type:         ItemType,
   name:         string;
   nsfw:         0 | 1;
-  group_id:     number;
   description?: string;
   thumbnail?:   string;
 }
@@ -19,9 +24,8 @@ export interface Groups {
   thumbnail?:   string;
 }
 
-export type Result = Item;
-
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv {
       DATABASE_DIR: string;

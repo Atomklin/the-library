@@ -29,11 +29,11 @@ CREATE TABLE IF NOT EXISTS items (
   thumbnail    TEXT
 ) STRICT;
 
-CREATE TABLE IF NOT EXISTS item_metadata (
+CREATE TABLE IF NOT EXISTS item_checksum (
   id             INTEGER PRIMARY KEY,
   size           INTEGER,
-  creation_date  TEXT,
-  md5_checksum   TEXT
+  date           TEXT,
+  md5            TEXT
 ) STRICT;
 
 /* 
@@ -41,4 +41,4 @@ CREATE TABLE IF NOT EXISTS item_metadata (
   Info : https://www.sqlite.org/fts3.html#tokenizer
 */
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_index 
-USING fts5(id UNINDEXED, name, description, tokenize=porter);
+USING fts5(id UNINDEXED, name, description, tokenize='porter');

@@ -19,7 +19,7 @@
     {#if results.length}
       <div class="flex flex-col gap-3">
         {#each results as result (result.id)}
-          <Card {result}/>    
+          <Card {result} />    
         {/each}    
       </div>
     {:else}

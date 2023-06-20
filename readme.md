@@ -16,6 +16,7 @@ Before running this project, make sure you have the following installed:
 - Node.JS (`18.0^`)
 - npm (`8.0^`)
 - **Docker** and **Docker Compose**
+- Windows Terminal
 
 ## Installation
 1. Clone the repository:
@@ -23,7 +24,7 @@ Before running this project, make sure you have the following installed:
 git clone https://github.com/Atomklin/the-library
 ```
 
-2. run the start script
+2. Run the start script
 ```bash
 # For development :
 start-dev.cmd

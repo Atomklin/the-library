@@ -16,7 +16,7 @@
       {label}
     </Label>
   {/if}
-  <span class="flex flex-col md:flex-row gap-2">
+  <span class="flex flex-col lg:flex-row gap-2">
     <slot name="left" />
     <input 
       class="rounded-md border-1 border-solid block text-lg font-normal m-0 p-2 w-full" 

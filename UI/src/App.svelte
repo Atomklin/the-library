@@ -2,14 +2,16 @@
   import type { SearchResponse } from "./Data/types";
   
   import Results from "./Sections/results/Results.svelte";
-  import Search from "./Sections/search/Search.svelte";
+  import SearchBar from "./Sections/search/SearchBar.svelte";
+  import Medias from "./Sections/media/Medias.svelte"
   
   let results: Promise<SearchResponse> | SearchResponse;
 </script>
 
 
 <main>
-  <Search bind:results />
+  <Medias />
+  <SearchBar bind:results />
   {#if results}
     <Results {results} />
   {/if}

@@ -2,7 +2,8 @@ import { readdir } from "node:fs/promises";
 import { join, parse, relative, sep } from "node:path";
 
 import { filesDir, pathToURLPathname, thumbnailDir } from "./common";
-import database, { ItemType } from "./database";
+import database from "./database";
+import { ItemType } from "./types";
 
 /** Crawls the `FILES_DIR` directory and saves the indexes to the database */
 export async function indexFilesDirectory() {

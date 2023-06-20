@@ -9,13 +9,12 @@ const port = 6969;
 
 app.disable("x-powered-by");
 app.use("/api/search", search);
+app.listen(port, () => 
+  console.log("Listening to http://localhost:6969/api")
+);
 
 
 void async function() {
   await indexFilesDirectory();
   await generateVideoThumbnails();
-  
-  app.listen(port, () => 
-    console.log("Listening to http://localhost:6969/api")
-  );
 }();

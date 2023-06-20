@@ -19,10 +19,3 @@ runSQL("tables-setup.sql");
 runSQL("triggers-setup.sql");
 
 export default database;
-export enum ItemType {
-  Unknown = 0,
-  Group = 1,
-  Video = 2,
-  Audio = 3,
-  Image = 4
-}
